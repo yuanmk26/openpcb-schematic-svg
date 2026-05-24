@@ -1,3 +1,17 @@
 # openpcb-schematic-svg
 
-`openpcb-schematic-svg` 把 `SchematicIR` 直接导出为最小 SVG 预览，当前版本只绘制元件本体、引脚 stub 与基础文字。
+`openpcb-schematic-svg` converts `SchematicDocument` into a minimal SVG preview.
+
+## Generate example SVG files
+
+```bash
+npm run build
+npm run example
+```
+
+Example schematics are stored in `examples/fixtures/` inside this repository.
+
+This writes:
+
+- `examples/generated/connector-header-1x4.svg`
+- `examples/generated/simple-pin-ops.svg`

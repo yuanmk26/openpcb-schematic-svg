@@ -1,0 +1,339 @@
+{
+  "id": "schematic-1",
+  "title": "simple-pin-ops",
+  "sheets": [
+    {
+      "id": "sheet-1",
+      "name": "Sheet 1",
+      "items": [
+        {
+          "kind": "symbol",
+          "id": "symbol:C1",
+          "sourceRef": "C1",
+          "symbolKind": "passive_capacitor",
+          "symbolSpecId": "passive_capacitor",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "rotation": 0,
+          "pins": [
+            {
+              "id": "pin:C1:1",
+              "name": "1",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -12,
+                "y": 0
+              },
+              "electricalType": "passive"
+            },
+            {
+              "id": "pin:C1:2",
+              "name": "2",
+              "direction": "passive",
+              "side": "right",
+              "offset": {
+                "x": 12,
+                "y": 0
+              },
+              "electricalType": "passive"
+            }
+          ],
+          "labels": [
+            {
+              "text": "C1"
+            }
+          ],
+          "properties": {
+            "type": "Capacitor",
+            "value": "100nF"
+          },
+          "placementSource": "auto"
+        },
+        {
+          "kind": "symbol",
+          "id": "symbol:Inst_U1",
+          "sourceRef": "Inst_U1",
+          "symbolKind": "generic_component",
+          "symbolSpecId": "generic_component",
+          "position": {
+            "x": 80,
+            "y": 0
+          },
+          "rotation": 0,
+          "pins": [
+            {
+              "id": "pin:Inst_U1:P1",
+              "name": "P1",
+              "side": "left",
+              "offset": {
+                "x": -20,
+                "y": 0
+              }
+            },
+            {
+              "id": "pin:Inst_U1:P2",
+              "name": "P2",
+              "side": "right",
+              "offset": {
+                "x": 20,
+                "y": 0
+              }
+            }
+          ],
+          "labels": [
+            {
+              "text": "Inst_U1"
+            }
+          ],
+          "properties": {
+            "type": "U1"
+          },
+          "placementSource": "auto"
+        },
+        {
+          "kind": "symbol",
+          "id": "symbol:R1",
+          "sourceRef": "R1",
+          "symbolKind": "passive_resistor",
+          "symbolSpecId": "passive_resistor",
+          "position": {
+            "x": 160,
+            "y": 0
+          },
+          "rotation": 0,
+          "pins": [
+            {
+              "id": "pin:R1:1",
+              "name": "1",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -12,
+                "y": 0
+              },
+              "electricalType": "passive"
+            },
+            {
+              "id": "pin:R1:2",
+              "name": "2",
+              "direction": "passive",
+              "side": "right",
+              "offset": {
+                "x": 12,
+                "y": 0
+              },
+              "electricalType": "passive"
+            }
+          ],
+          "labels": [
+            {
+              "text": "R1"
+            }
+          ],
+          "properties": {
+            "type": "Resistor",
+            "value": "10k"
+          },
+          "placementSource": "auto"
+        },
+        {
+          "kind": "symbol",
+          "id": "symbol:R2",
+          "sourceRef": "R2",
+          "symbolKind": "passive_resistor",
+          "symbolSpecId": "passive_resistor",
+          "position": {
+            "x": 240,
+            "y": 0
+          },
+          "rotation": 0,
+          "pins": [
+            {
+              "id": "pin:R2:1",
+              "name": "1",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -12,
+                "y": 0
+              },
+              "electricalType": "passive"
+            },
+            {
+              "id": "pin:R2:2",
+              "name": "2",
+              "direction": "passive",
+              "side": "right",
+              "offset": {
+                "x": 12,
+                "y": 0
+              },
+              "electricalType": "passive"
+            }
+          ],
+          "labels": [
+            {
+              "text": "R2"
+            }
+          ],
+          "properties": {
+            "type": "Resistor",
+            "value": "22R"
+          },
+          "placementSource": "auto"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:GND",
+          "netName": "GND",
+          "position": {
+            "x": 22,
+            "y": 0
+          },
+          "orientation": "right"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:net4",
+          "netName": "net4",
+          "position": {
+            "x": 262,
+            "y": 0
+          },
+          "orientation": "right"
+        },
+        {
+          "kind": "junction",
+          "id": "junction:node1",
+          "position": {
+            "x": 108,
+            "y": -6
+          }
+        },
+        {
+          "kind": "wire",
+          "id": "wire:node1:0",
+          "netName": "node1",
+          "points": [
+            {
+              "x": 60,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": -6
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:node1:1",
+          "netName": "node1",
+          "points": [
+            {
+              "x": 148,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": -6
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:node1:2",
+          "netName": "node1",
+          "points": [
+            {
+              "x": 100,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": -6
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:node1:3",
+          "netName": "node1",
+          "points": [
+            {
+              "x": 228,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": -6
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:node1:4",
+          "netName": "node1",
+          "points": [
+            {
+              "x": -12,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": 0
+            },
+            {
+              "x": 108,
+              "y": -6
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:node1",
+          "netName": "node1",
+          "position": {
+            "x": 116,
+            "y": -10
+          },
+          "orientation": "right"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:VCC",
+          "netName": "VCC",
+          "position": {
+            "x": 182,
+            "y": 0
+          },
+          "orientation": "right"
+        }
+      ]
+    }
+  ]
+}

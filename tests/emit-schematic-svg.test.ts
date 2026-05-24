@@ -4,12 +4,12 @@ import type { SchematicDocument } from "openpcb-schematic-core";
 import { emitSchematicSvg } from "../src";
 
 function readFixture(relativePath: string): SchematicDocument {
-  return JSON.parse(readFileSync(new URL(`../../openpcb-dsl/${relativePath}`, import.meta.url), "utf8"));
+  return JSON.parse(readFileSync(new URL(`../examples/fixtures/${relativePath}`, import.meta.url), "utf8"));
 }
 
 describe("openpcb-schematic-svg", () => {
   it("renders connector symbols into svg", () => {
-    const schematic = readFixture("examples/schematic/connector-header-1x4.schematic.json");
+    const schematic = readFixture("connector-header-1x4.schematic.json");
     const svg = emitSchematicSvg(schematic);
 
     expect(svg).toContain("<svg");
@@ -19,7 +19,7 @@ describe("openpcb-schematic-svg", () => {
   });
 
   it("renders passive component labels into svg", () => {
-    const schematic = readFixture("examples/schematic/simple-pin-ops.schematic.json");
+    const schematic = readFixture("simple-pin-ops.schematic.json");
     const svg = emitSchematicSvg(schematic);
 
     expect(svg).toContain("R1");

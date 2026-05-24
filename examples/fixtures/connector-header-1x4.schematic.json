@@ -1,0 +1,121 @@
+{
+  "id": "schematic-1",
+  "title": "connector-header-1x4",
+  "sheets": [
+    {
+      "id": "sheet-1",
+      "name": "Sheet 1",
+      "items": [
+        {
+          "kind": "symbol",
+          "id": "symbol:J1",
+          "sourceRef": "J1",
+          "symbolKind": "connector_header_1x4",
+          "symbolSpecId": "connector_header_1x4",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "rotation": 0,
+          "pins": [
+            {
+              "id": "pin:J1:1",
+              "name": "1",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -34,
+                "y": -24
+              },
+              "electricalType": "passive"
+            },
+            {
+              "id": "pin:J1:2",
+              "name": "2",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -34,
+                "y": -8
+              },
+              "electricalType": "passive"
+            },
+            {
+              "id": "pin:J1:3",
+              "name": "3",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -34,
+                "y": 8
+              },
+              "electricalType": "passive"
+            },
+            {
+              "id": "pin:J1:4",
+              "name": "4",
+              "direction": "passive",
+              "side": "left",
+              "offset": {
+                "x": -34,
+                "y": 24
+              },
+              "electricalType": "passive"
+            }
+          ],
+          "labels": [
+            {
+              "text": "J1"
+            }
+          ],
+          "properties": {
+            "type": "CONNECTOR_HEADER_1X4",
+            "device": "CONNECTOR_HEADER_1X4",
+            "component": "Header1x4"
+          },
+          "placementSource": "auto"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:GND",
+          "netName": "GND",
+          "position": {
+            "x": -44,
+            "y": 24
+          },
+          "orientation": "left"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:IO0",
+          "netName": "IO0",
+          "position": {
+            "x": -44,
+            "y": -8
+          },
+          "orientation": "left"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:IO1",
+          "netName": "IO1",
+          "position": {
+            "x": -44,
+            "y": 8
+          },
+          "orientation": "left"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:VCC",
+          "netName": "VCC",
+          "position": {
+            "x": -44,
+            "y": -24
+          },
+          "orientation": "left"
+        }
+      ]
+    }
+  ]
+}
