@@ -1,0 +1,27 @@
+{
+  "name": "openpcb-schematic-svg",
+  "version": "0.1.0",
+  "description": "Minimal SVG preview renderer for OpenPCB SchematicIR.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node ../openpcb-dsl/node_modules/tsup/dist/cli-default.js src/index.ts --format esm --dts",
+    "test": "node ../openpcb-dsl/node_modules/vitest/vitest.mjs run",
+    "typecheck": "node ../openpcb-dsl/node_modules/typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "openpcb-schematic-core": "file:../openpcb-schematic-core",
+    "openpcb-schematic-symbols": "file:../openpcb-schematic-symbols"
+  }
+}
