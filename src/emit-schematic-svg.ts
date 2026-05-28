@@ -89,6 +89,21 @@ function computeBounds(symbols: SchematicSymbolInstance[], padding: number): Bou
       minY = Math.min(minY, pinPoint.y);
       maxX = Math.max(maxX, pinPoint.x);
       maxY = Math.max(maxY, pinPoint.y);
+
+      const bodyPoint = projectPinToBody(position, pin, spec);
+      const labels: Point[] = [];
+      if (pin.number !== undefined) {
+        labels.push(pinNamePosition(bodyPoint, pinPoint));
+      }
+      labels.push(pinLabelPosition(bodyPoint, pinPoint));
+
+      const labelRadius = 10;
+      for (const lp of labels) {
+        minX = Math.min(minX, lp.x - labelRadius);
+        minY = Math.min(minY, lp.y - labelRadius);
+        maxX = Math.max(maxX, lp.x + labelRadius);
+        maxY = Math.max(maxY, lp.y + labelRadius);
+      }
     }
 
     if (spec.labels?.ref) {
@@ -129,8 +144,10 @@ function renderSymbol(
   const fontSize = options.fontSize ?? DEFAULT_FONT_SIZE;
   const parts: string[] = [];
 
-  parts.push(...renderPins(position, symbol.pins, spec, stroke));
+  // Phase 1: pin lines (behind body)
+  parts.push(...renderPinLines(position, symbol.pins, spec, stroke));
 
+  // Phase 2: body
   switch (spec.body.shape) {
     case "passive_capacitor":
       parts.push(...renderCapacitor(position, spec, stroke));
@@ -144,6 +161,10 @@ function renderSymbol(
       break;
   }
 
+  // Phase 3: pin labels (on top of body)
+  parts.push(...renderPinLabels(position, symbol.pins, spec, textColor, fontFamily, fontSize));
+
+  // Phase 4: ref/value labels
   if (spec.labels?.ref) {
     parts.push(
       renderText(
@@ -173,25 +194,127 @@ function renderSymbol(
   return parts;
 }
 
-function renderPins(
+function renderPinLines(
   position: Point,
   pins: SchematicPinAnchor[],
   spec: SymbolSpec,
   stroke: string,
 ): string[] {
+  return pins.map((pin) => {
+    const pinPoint = addPoints(position, pin.offset ?? { x: 0, y: 0 });
+    const bodyPoint = projectPinToBody(position, pin, spec);
+    return `<line x1="${round(bodyPoint.x)}" y1="${round(bodyPoint.y)}" x2="${round(pinPoint.x)}" y2="${round(
+      pinPoint.y,
+    )}" stroke="${escapeXml(stroke)}" stroke-width="2"/>`;
+  });
+}
+
+function renderPinLabels(
+  position: Point,
+  pins: SchematicPinAnchor[],
+  spec: SymbolSpec,
+  textColor: string,
+  fontFamily: string,
+  fontSize: number,
+): string[] {
+  const pinFontSize = Math.round(fontSize * 0.75);
   const parts: string[] = [];
 
   for (const pin of pins) {
     const pinPoint = addPoints(position, pin.offset ?? { x: 0, y: 0 });
     const bodyPoint = projectPinToBody(position, pin, spec);
-    parts.push(
-      `<line x1="${round(bodyPoint.x)}" y1="${round(bodyPoint.y)}" x2="${round(pinPoint.x)}" y2="${round(
-        pinPoint.y,
-      )}" stroke="${escapeXml(stroke)}" stroke-width="2"/>`,
-    );
+    const nameAnchor = pinNameTextAnchor(pin.side);
+
+    if (pin.number !== undefined) {
+      const namePoint = pinNamePosition(bodyPoint, pinPoint);
+      parts.push(
+        `<text x="${round(namePoint.x)}" y="${round(namePoint.y)}" fill="${escapeXml(
+          textColor,
+        )}" font-family="${escapeXml(fontFamily)}" font-size="${pinFontSize}" text-anchor="${nameAnchor}" dominant-baseline="middle">${escapeXml(
+          pin.name,
+        )}</text>`,
+      );
+
+      const numberPoint = pinLabelPosition(bodyPoint, pinPoint);
+      parts.push(
+        `<text x="${round(numberPoint.x)}" y="${round(numberPoint.y)}" fill="${escapeXml(
+          textColor,
+        )}" font-family="${escapeXml(fontFamily)}" font-size="${pinFontSize}" text-anchor="middle" dominant-baseline="middle">${escapeXml(
+          pin.number,
+        )}</text>`,
+      );
+    } else {
+      const labelPoint = pinLabelPosition(bodyPoint, pinPoint);
+      parts.push(
+        `<text x="${round(labelPoint.x)}" y="${round(labelPoint.y)}" fill="${escapeXml(
+          textColor,
+        )}" font-family="${escapeXml(fontFamily)}" font-size="${pinFontSize}" text-anchor="middle" dominant-baseline="middle">${escapeXml(
+          pin.name,
+        )}</text>`,
+      );
+    }
   }
 
   return parts;
+}
+
+function pinNameTextAnchor(side?: string): string {
+  switch (side) {
+    case "left":
+      return "start";
+    case "right":
+      return "end";
+    default:
+      return "middle";
+  }
+}
+
+function pinLabelPosition(
+  bodyPoint: Point,
+  pinPoint: Point,
+): Point {
+  const insetFromTip = 4;
+  const perpendicularOffset = 5;
+  const dx = pinPoint.x - bodyPoint.x;
+  const dy = pinPoint.y - bodyPoint.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const ux = dx / length;
+  const uy = dy / length;
+
+  // Place label at pin tip, offset inward toward body
+  const baseX = pinPoint.x - ux * insetFromTip;
+  const baseY = pinPoint.y - uy * insetFromTip;
+
+  // Perpendicular offset: always up for horizontal pins, always right for vertical
+  const isHorizontal = Math.abs(ux) > Math.abs(uy);
+  if (isHorizontal) {
+    return { x: baseX, y: baseY - perpendicularOffset };
+  }
+  return { x: baseX + perpendicularOffset, y: baseY };
+}
+
+function pinNamePosition(
+  bodyPoint: Point,
+  pinPoint: Point,
+): Point {
+  const insetFromEdge = 8;
+  const perpendicularOffset = 5;
+  const dx = pinPoint.x - bodyPoint.x;
+  const dy = pinPoint.y - bodyPoint.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const ux = dx / length;
+  const uy = dy / length;
+
+  // Place label inside body, offset inward from body edge toward center
+  const baseX = bodyPoint.x - ux * insetFromEdge;
+  const baseY = bodyPoint.y - uy * insetFromEdge;
+
+  // Perpendicular offset: always up for horizontal pins, always right for vertical
+  const isHorizontal = Math.abs(ux) > Math.abs(uy);
+  if (isHorizontal) {
+    return { x: baseX, y: baseY - perpendicularOffset };
+  }
+  return { x: baseX + perpendicularOffset, y: baseY };
 }
 
 function renderRectBody(position: Point, spec: SymbolSpec, stroke: string, fill: string): string {
@@ -253,6 +376,10 @@ function renderText(
 }
 
 function resolveSymbolSpec(symbol: SchematicSymbolInstance): SymbolSpec {
+  if (symbol.symbolSpec) {
+    return symbol.symbolSpec;
+  }
+
   const direct = symbol.symbolSpecId ? getSymbolSpecById(symbol.symbolSpecId) : undefined;
   if (direct) {
     return direct;
