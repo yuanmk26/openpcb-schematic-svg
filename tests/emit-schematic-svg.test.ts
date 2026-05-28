@@ -26,6 +26,12 @@ describe("openpcb-schematic-svg", () => {
     expect(svg).toContain("C1");
     expect(svg).toContain("10k");
     expect(svg).toContain("100nF");
+    expect(svg).toContain("<polyline");
+    expect(svg).toContain("data-wire-id=\"wire:node1:0\"");
+    expect(svg).toContain("data-junction-id=\"junction:node1\"");
+    expect(svg).toContain("data-net-label-id=\"net-label:node1\"");
+    expect(svg).toContain(">VCC</text>");
+    expect(svg).not.toContain("data-net-label-id=\"net-label:node1\"><path");
   });
 
   it("prefers inline symbol specs over registry lookup", () => {

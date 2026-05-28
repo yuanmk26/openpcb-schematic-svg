@@ -1,0 +1,114 @@
+{
+  "id": "schematic-junction-fanout",
+  "title": "junction-fanout",
+  "sheets": [
+    {
+      "id": "sheet-1",
+      "name": "Sheet 1",
+      "items": [
+        {
+          "kind": "junction",
+          "id": "junction:center",
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "kind": "wire",
+          "id": "wire:left",
+          "netName": "STAR",
+          "points": [
+            {
+              "x": -80,
+              "y": 0
+            },
+            {
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "routingStyle": "direct"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:right",
+          "netName": "STAR",
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 80,
+              "y": 0
+            }
+          ],
+          "routingStyle": "direct"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:top",
+          "netName": "STAR",
+          "points": [
+            {
+              "x": 0,
+              "y": -60
+            },
+            {
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "routingStyle": "direct"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:bottom",
+          "netName": "STAR",
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 0,
+              "y": 60
+            }
+          ],
+          "routingStyle": "direct"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:branch",
+          "netName": "STAR",
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 40,
+              "y": 0
+            },
+            {
+              "x": 40,
+              "y": 35
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:star",
+          "netName": "STAR",
+          "position": {
+            "x": 48,
+            "y": 35
+          },
+          "orientation": "right"
+        }
+      ]
+    }
+  ]
+}

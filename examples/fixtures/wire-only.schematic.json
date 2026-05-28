@@ -1,0 +1,96 @@
+{
+  "id": "schematic-wire-only",
+  "title": "wire-only",
+  "sheets": [
+    {
+      "id": "sheet-1",
+      "name": "Sheet 1",
+      "items": [
+        {
+          "kind": "wire",
+          "id": "wire:horizontal",
+          "netName": "NET_H",
+          "points": [
+            {
+              "x": -80,
+              "y": -20
+            },
+            {
+              "x": 80,
+              "y": -20
+            }
+          ],
+          "routingStyle": "direct"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:vertical",
+          "netName": "NET_V",
+          "points": [
+            {
+              "x": -20,
+              "y": -60
+            },
+            {
+              "x": -20,
+              "y": 60
+            }
+          ],
+          "routingStyle": "direct"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:orthogonal",
+          "netName": "NET_O",
+          "points": [
+            {
+              "x": 20,
+              "y": -40
+            },
+            {
+              "x": 60,
+              "y": -40
+            },
+            {
+              "x": 60,
+              "y": 20
+            },
+            {
+              "x": 100,
+              "y": 20
+            }
+          ],
+          "routingStyle": "orthogonal"
+        },
+        {
+          "kind": "wire",
+          "id": "wire:zigzag",
+          "netName": "NET_Z",
+          "points": [
+            {
+              "x": -90,
+              "y": 30
+            },
+            {
+              "x": -40,
+              "y": 30
+            },
+            {
+              "x": -40,
+              "y": 10
+            },
+            {
+              "x": 10,
+              "y": 10
+            },
+            {
+              "x": 10,
+              "y": 50
+            }
+          ],
+          "routingStyle": "orthogonal"
+        }
+      ]
+    }
+  ]
+}

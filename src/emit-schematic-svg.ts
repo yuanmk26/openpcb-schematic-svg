@@ -1,8 +1,12 @@
 import type {
   Point,
   SchematicDocument,
+  SchematicItem,
+  SchematicJunction,
+  SchematicNetLabel,
   SchematicPinAnchor,
   SchematicSymbolInstance,
+  SchematicWire,
   SymbolSpec,
   SymbolTextPlacement,
 } from "openpcb-schematic-core";
@@ -32,18 +36,23 @@ const DEFAULT_TEXT_COLOR = "#0f0f0f";
 const DEFAULT_BACKGROUND = "#ffffff";
 const DEFAULT_FONT_FAMILY = "sans-serif";
 const DEFAULT_FONT_SIZE = 12;
+const DEFAULT_WIRE_WIDTH = 2;
+const DEFAULT_JUNCTION_RADIUS = 3;
+const NET_LABEL_TEXT_GAP = 6;
 
 export function emitSchematicSvg(
   schematic: SchematicDocument,
   options: EmitSchematicSvgOptions = {},
 ): string {
-  const symbols = schematic.sheets[0]?.items.filter(
-    (item): item is SchematicSymbolInstance => item.kind === "symbol",
-  ) ?? [];
+  const items = schematic.sheets[0]?.items ?? [];
 
-  const bounds = computeBounds(symbols, options.padding ?? DEFAULT_PADDING);
+  const bounds = computeBounds(items, options.padding ?? DEFAULT_PADDING, options.fontSize ?? DEFAULT_FONT_SIZE);
   const width = Math.max(1, bounds.maxX - bounds.minX);
   const height = Math.max(1, bounds.maxY - bounds.minY);
+  const stroke = options.stroke ?? DEFAULT_STROKE;
+  const textColor = options.textColor ?? DEFAULT_TEXT_COLOR;
+  const fontFamily = options.fontFamily ?? DEFAULT_FONT_FAMILY;
+  const fontSize = options.fontSize ?? DEFAULT_FONT_SIZE;
 
   const parts: string[] = [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${round(bounds.minX)} ${round(bounds.minY)} ${round(width)} ${round(height)}" width="${round(width)}" height="${round(height)}">`,
@@ -52,18 +61,30 @@ export function emitSchematicSvg(
     )}"/>`,
   ];
 
-  for (const symbol of symbols) {
+  for (const wire of items.filter((item): item is SchematicWire => item.kind === "wire")) {
+    parts.push(renderWire(wire, stroke));
+  }
+
+  for (const junction of items.filter((item): item is SchematicJunction => item.kind === "junction")) {
+    parts.push(renderJunction(junction, stroke));
+  }
+
+  for (const symbol of items.filter((item): item is SchematicSymbolInstance => item.kind === "symbol")) {
     const spec = resolveSymbolSpec(symbol);
     const groupParts = renderSymbol(symbol, spec, options);
     parts.push(`<g data-symbol-id="${escapeXml(symbol.id)}">${groupParts.join("")}</g>`);
+  }
+
+  for (const label of items.filter((item): item is SchematicNetLabel => item.kind === "net_label")) {
+    parts.push(renderNetLabel(label, textColor, fontFamily, fontSize));
   }
 
   parts.push("</svg>");
   return parts.join("");
 }
 
-function computeBounds(symbols: SchematicSymbolInstance[], padding: number): Bounds {
-  if (symbols.length === 0) {
+function computeBounds(items: SchematicItem[], padding: number, fontSize: number): Bounds {
+  if (items.length === 0) {
     return { minX: 0, minY: 0, maxX: padding * 2, maxY: padding * 2 };
   }
 
@@ -72,7 +93,7 @@ function computeBounds(symbols: SchematicSymbolInstance[], padding: number): Bou
   let maxX = Number.NEGATIVE_INFINITY;
   let maxY = Number.NEGATIVE_INFINITY;
 
-  for (const symbol of symbols) {
+  for (const symbol of items.filter((item): item is SchematicSymbolInstance => item.kind === "symbol")) {
     const spec = resolveSymbolSpec(symbol);
     const position = symbol.position ?? { x: 0, y: 0 };
     const halfWidth = spec.body.width / 2;
@@ -121,6 +142,30 @@ function computeBounds(symbols: SchematicSymbolInstance[], padding: number): Bou
       maxX = Math.max(maxX, point.x + 12);
       maxY = Math.max(maxY, point.y + 12);
     }
+  }
+
+  for (const wire of items.filter((item): item is SchematicWire => item.kind === "wire")) {
+    for (const point of wire.points) {
+      minX = Math.min(minX, point.x - DEFAULT_WIRE_WIDTH);
+      minY = Math.min(minY, point.y - DEFAULT_WIRE_WIDTH);
+      maxX = Math.max(maxX, point.x + DEFAULT_WIRE_WIDTH);
+      maxY = Math.max(maxY, point.y + DEFAULT_WIRE_WIDTH);
+    }
+  }
+
+  for (const junction of items.filter((item): item is SchematicJunction => item.kind === "junction")) {
+    minX = Math.min(minX, junction.position.x - DEFAULT_JUNCTION_RADIUS);
+    minY = Math.min(minY, junction.position.y - DEFAULT_JUNCTION_RADIUS);
+    maxX = Math.max(maxX, junction.position.x + DEFAULT_JUNCTION_RADIUS);
+    maxY = Math.max(maxY, junction.position.y + DEFAULT_JUNCTION_RADIUS);
+  }
+
+  for (const label of items.filter((item): item is SchematicNetLabel => item.kind === "net_label")) {
+    const labelBounds = computeNetLabelBounds(label, fontSize);
+    minX = Math.min(minX, labelBounds.minX);
+    minY = Math.min(minY, labelBounds.minY);
+    maxX = Math.max(maxX, labelBounds.maxX);
+    maxY = Math.max(maxY, labelBounds.maxY);
   }
 
   return {
@@ -192,6 +237,35 @@ function renderSymbol(
   }
 
   return parts;
+}
+
+function renderWire(wire: SchematicWire, stroke: string): string {
+  const points = wire.points.map((point) => `${round(point.x)},${round(point.y)}`).join(" ");
+  return `<polyline data-wire-id="${escapeXml(wire.id)}" points="${points}" fill="none" stroke="${escapeXml(
+    stroke,
+  )}" stroke-width="${DEFAULT_WIRE_WIDTH}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+
+function renderJunction(junction: SchematicJunction, fill: string): string {
+  return `<circle data-junction-id="${escapeXml(junction.id)}" cx="${round(junction.position.x)}" cy="${round(
+    junction.position.y,
+  )}" r="${DEFAULT_JUNCTION_RADIUS}" fill="${escapeXml(fill)}"/>`;
+}
+
+function renderNetLabel(
+  label: SchematicNetLabel,
+  textColor: string,
+  fontFamily: string,
+  fontSize: number,
+): string {
+  const geometry = getNetLabelGeometry(label.position, label.orientation ?? "right", fontSize);
+  return `<g data-net-label-id="${escapeXml(label.id)}"><text x="${round(
+    geometry.textPosition.x,
+  )}" y="${round(geometry.textPosition.y)}" fill="${escapeXml(textColor)}" font-family="${escapeXml(
+    fontFamily,
+  )}" font-size="${round(fontSize)}" text-anchor="${geometry.textAnchor}" dominant-baseline="middle">${escapeXml(
+    label.netName,
+  )}</text></g>`;
 }
 
 function renderPinLines(
@@ -373,6 +447,88 @@ function renderText(
   )}" font-family="${escapeXml(fontFamily)}" font-size="${round(fontSize)}" text-anchor="${textAnchor}" dominant-baseline="${baseline}">${escapeXml(
     text,
   )}</text>`;
+}
+
+function computeNetLabelBounds(label: SchematicNetLabel, fontSize: number): Bounds {
+  const geometry = getNetLabelGeometry(label.position, label.orientation ?? "right", fontSize);
+  const textWidth = estimateTextWidth(label.netName, fontSize);
+  const textHalfHeight = fontSize * 0.6;
+  const textPoints =
+    geometry.textAnchor === "start"
+      ? [
+          geometry.textPosition,
+          { x: geometry.textPosition.x + textWidth, y: geometry.textPosition.y },
+        ]
+      : geometry.textAnchor === "end"
+        ? [
+            geometry.textPosition,
+            { x: geometry.textPosition.x - textWidth, y: geometry.textPosition.y },
+          ]
+        : [
+            { x: geometry.textPosition.x - textWidth / 2, y: geometry.textPosition.y },
+            { x: geometry.textPosition.x + textWidth / 2, y: geometry.textPosition.y },
+          ];
+  const points = [geometry.anchorPoint, ...textPoints];
+
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+
+  for (const point of points) {
+    minX = Math.min(minX, point.x);
+    minY = Math.min(minY, point.y - textHalfHeight);
+    maxX = Math.max(maxX, point.x);
+    maxY = Math.max(maxY, point.y + textHalfHeight);
+  }
+
+  return { minX, minY, maxX, maxY };
+}
+
+function getNetLabelGeometry(
+  position: Point,
+  orientation: "left" | "right" | "up" | "down",
+  fontSize: number,
+): {
+  textPosition: Point;
+  textAnchor: "start" | "end" | "middle";
+  anchorPoint: Point;
+} {
+  switch (orientation) {
+    case "left": {
+      return {
+        textPosition: { x: position.x - NET_LABEL_TEXT_GAP, y: position.y },
+        textAnchor: "end",
+        anchorPoint: position,
+      };
+    }
+    case "up": {
+      return {
+        textPosition: { x: position.x, y: position.y - fontSize * 0.6 - NET_LABEL_TEXT_GAP },
+        textAnchor: "middle",
+        anchorPoint: position,
+      };
+    }
+    case "down": {
+      return {
+        textPosition: { x: position.x, y: position.y + fontSize * 0.6 + NET_LABEL_TEXT_GAP },
+        textAnchor: "middle",
+        anchorPoint: position,
+      };
+    }
+    case "right":
+    default: {
+      return {
+        textPosition: { x: position.x + NET_LABEL_TEXT_GAP, y: position.y },
+        textAnchor: "start",
+        anchorPoint: position,
+      };
+    }
+  }
+}
+
+function estimateTextWidth(text: string, fontSize: number): number {
+  return Math.max(fontSize * 0.6, text.length * fontSize * 0.6);
 }
 
 function resolveSymbolSpec(symbol: SchematicSymbolInstance): SymbolSpec {

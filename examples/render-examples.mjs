@@ -1,11 +1,16 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { emitSchematicSvg } from "../dist/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const outputDir = path.join(__dirname, "generated");
+const distPath = path.join(rootDir, "dist", "index.js");
+const distUrl = new URL(
+  `../dist/index.js?v=${statSync(distPath).mtimeMs}`,
+  import.meta.url,
+);
+const { emitSchematicSvg } = await import(distUrl.href);
 
 const examples = [
   {
@@ -15,6 +20,18 @@ const examples = [
   {
     input: path.join(__dirname, "fixtures", "simple-pin-ops.schematic.json"),
     output: path.join(outputDir, "simple-pin-ops.svg"),
+  },
+  {
+    input: path.join(__dirname, "fixtures", "wire-only.schematic.json"),
+    output: path.join(outputDir, "wire-only.svg"),
+  },
+  {
+    input: path.join(__dirname, "fixtures", "net-label-orientations.schematic.json"),
+    output: path.join(outputDir, "net-label-orientations.svg"),
+  },
+  {
+    input: path.join(__dirname, "fixtures", "junction-fanout.schematic.json"),
+    output: path.join(outputDir, "junction-fanout.svg"),
   },
 ];
 

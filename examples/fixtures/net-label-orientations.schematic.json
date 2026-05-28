@@ -1,0 +1,52 @@
+{
+  "id": "schematic-net-label-orientations",
+  "title": "net-label-orientations",
+  "sheets": [
+    {
+      "id": "sheet-1",
+      "name": "Sheet 1",
+      "items": [
+        {
+          "kind": "net_label",
+          "id": "net-label:right",
+          "netName": "RIGHT_LABEL",
+          "position": {
+            "x": -20,
+            "y": -40
+          },
+          "orientation": "right"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:left",
+          "netName": "LEFT_LABEL",
+          "position": {
+            "x": 20,
+            "y": -40
+          },
+          "orientation": "left"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:up",
+          "netName": "UP_LABEL",
+          "position": {
+            "x": -20,
+            "y": 30
+          },
+          "orientation": "up"
+        },
+        {
+          "kind": "net_label",
+          "id": "net-label:down",
+          "netName": "DOWN_LABEL",
+          "position": {
+            "x": 20,
+            "y": 30
+          },
+          "orientation": "down"
+        }
+      ]
+    }
+  ]
+}
